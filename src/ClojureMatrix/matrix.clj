@@ -28,6 +28,13 @@
 		  n (count (get-column matrixB))]
 		  (if (= m n) (list m n) nil)))
 
+(defn proper? [matrix]
+	(apply = (map #(count %) matrix)))
+
+(defn square? [matrix]
+	(when (proper? matrix)
+		(= (count (get-row matrix 0)) (count (get-column matrix 0)))))
+
 (defn transpose [matrix]
       (for [i (range (count (first matrix)))]
-	   (get-column matrix i)))
+	   (get-column matrix i))) 
