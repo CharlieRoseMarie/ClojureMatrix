@@ -26,7 +26,7 @@
 	two matrices. Returns false otherwise."
 	(let [m (count (get-row matrixA)) 
 		  n (count (get-column matrixB))]
-		  (if (= m n) (list m n) nil)))
+		  (if (= m n) [m n] nil)))
 
 (defn proper? [matrix]
 	(apply = (map #(count %) matrix)))
