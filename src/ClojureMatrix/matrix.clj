@@ -46,5 +46,20 @@
   (apply map vector matrix))
 
 
+; Elementary row operatations
+(defn multiply-row [matrix row value]
+  "Multiplies the given row by some value. Returns the matrix."
+  {:pre [(proper? matrix) (>= 0 row) (< row (count matrix))]}
+  (update-in matrix [row] (fn [x] (map #(* value %) x))))
+
+(defn swap-rows [matrix r1 r2]
+  "Swaps the two given rows of the matrix"
+  {:pre [(proper? matrix) (>= r1 0) (< r1 (count matrix)) (>= r2 0) (< r2 (count matrix))]}
+  (let [row1 (matrix r1) row2 (matrix r2)]
+    (update-in (update-in matrix [r2] (fn [x] row1)) [r1] (fn [x] row2))))
+
+
+
+
 (defn determinant [matrix]
   0)
