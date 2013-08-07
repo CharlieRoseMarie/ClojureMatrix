@@ -4,6 +4,14 @@
   "Returns true if the matrix has the same number of elements for each row."
 	(apply = (map #(count %) matrix)))
 
+(defn count-preceeding-zeros [v]
+  "Returns the number of zeros at the front of a row."
+  (count (take-while #(= % 0) v)))
+
+(defn all-zeros? [v]
+  "Returns true if every element in a row is zero"
+  (every? #(= % 0) v))
+
 (defn- create-identity-row [size nth-col]
 	(for [i (range size)]
 		(if (= i nth-col)
