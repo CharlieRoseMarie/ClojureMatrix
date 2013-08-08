@@ -11,9 +11,9 @@
 
 (deftest get-row-test
 	(is (= [1 2 3] (get-row sample-matrix 0)))
-	(is (= [7 8 9] (get-row sample-matrix 2))))
-;  (is (thrown? AssertionError (get-row sample-matrix 5)))
-;  (is (thrown? AssertionError (get-row [[1] [1 2]] 0))))
+	(is (= [7 8 9] (get-row sample-matrix 2)))
+  (is (thrown? AssertionError (get-row sample-matrix 5)))
+  (is (thrown? AssertionError (get-row [[1] [1 2]] 0))))
 
 (deftest get-column-test
 	(is (= [1 4 7] (get-column sample-matrix 0))))
