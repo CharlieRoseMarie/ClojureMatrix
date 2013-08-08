@@ -4,11 +4,11 @@
   "Returns true if the matrix has the same number of elements for each row."
 	(apply = (map #(count %) matrix)))
 
-(defn count-preceeding-zeros [v]
+(defn- count-preceeding-zeros [v]
   "Returns the number of zeros at the front of a row."
   (count (take-while #(= % 0) v)))
 
-(defn all-zeros? [v]
+(defn- all-zeros? [v]
   "Returns true if every element in a row is zero"
   (every? #(= % 0) v))
 
@@ -19,10 +19,12 @@
 
 (defn create-identity [n]
 	"Creates an identity matrix of size n*n"
+  {:pre [(> n 0)]}
 	(for [row (range n)]
 		(create-identity-row n row)))
 
 (defn get-row [matrix row]
+  "Returns the nth row"
   {:pre [(proper? matrix) (< row (count matrix))]}
 	(nth matrix row))
 
@@ -53,6 +55,14 @@
   {:pre [(proper? matrix)]}
   (apply map vector matrix))
 
+; REF check
+
+(defn ref? [matrix]
+  "Returns true if the matrix is in REF."
+  {:pre [(proper? matrix)]}
+  (let [z-rows (map all-zeros? matrix) z-counts (map count-preceeding-zeros (filter #(not (all-zeros? %)) matrix))]
+    (and (every? #(= true %) (drop-while #(= false %) z-rows))
+         (apply < z-counts))))
 
 ; Elementary row operatations
 (defn multiply-row [matrix row value]
@@ -64,10 +74,6 @@
   "Swaps the two given rows of the matrix"
   {:pre [(proper? matrix) (>= r1 0) (< r1 (count matrix)) (>= r2 0) (< r2 (count matrix))]}
   (let [row1 (matrix r1) row2 (matrix r2)]
-    (update-in (update-in matrix [r2] (fn [x] row1)) [r1] (fn [x] row2))))
-
-
-
-
-(defn determinant [matrix]
-  0)
+    (-> matrix
+        (assoc r2 row1)
+        (assoc r1 row2))))

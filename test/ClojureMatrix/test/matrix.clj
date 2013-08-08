@@ -5,24 +5,15 @@
 (def sample-matrix [[1 2 3] [4 5 6] [7 8 9]])
 (def sample-matrix2 [[10 15 20] [11 9 2]])
 
-(deftest preceeding-zeros-test
-  (is (= 2 (count-preceeding-zeros [0 0 1 2])))
-  (is (= 0 (count-preceeding-zeros [1 2 0 0])))
-  (is (= 0 (count-preceeding-zeros []))))
-
-(deftest all-zero-test
-  (is (= true (all-zeros? [0 0 0 0 0])))
-  (is (= false (all-zeros? [0 0 0 1]))))
-
 (deftest identity-test
   (is (= [[1 0] [0 1]] (create-identity 2)))
   (is (= [[1 0 0] [0 1 0] [0 0 1]])))
 
 (deftest get-row-test
 	(is (= [1 2 3] (get-row sample-matrix 0)))
-	(is (= [7 8 9] (get-row sample-matrix 2)))
-  (is (thrown? AssertionError (get-row sample-matrix 5)))
-  (is (thrown? AssertionError (get-row [[1] [1 2]] 0))))
+	(is (= [7 8 9] (get-row sample-matrix 2))))
+;  (is (thrown? AssertionError (get-row sample-matrix 5)))
+;  (is (thrown? AssertionError (get-row [[1] [1 2]] 0))))
 
 (deftest get-column-test
 	(is (= [1 4 7] (get-column sample-matrix 0))))
@@ -42,6 +33,12 @@
 (deftest square-test
 	(is (square? sample-matrix))
 	(is (not (square? (conj sample-matrix [1 1 1])))))
+
+(deftest ref-test
+  (is (= true (ref? [[1 1 1] [0 1 1] [0 0 1]])))
+  (is (= true (ref? [[1 1 1 1] [0 0 0 1]])))
+  (is (= false (ref? sample-matrix)))
+  (is (= true (ref? [[1 1 1] [0 1 1] [0 0 0] [0 0 0]]))))
 
 (deftest multiplerow-test
   (is (= [[2 4 6] [4 5 6] [7 8 9]] (multiply-row sample-matrix 0 2)))
