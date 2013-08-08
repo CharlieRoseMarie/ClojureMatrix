@@ -61,8 +61,8 @@
   "Returns true if the matrix is in REF."
   {:pre [(proper? matrix)]}
   (let [z-rows (map all-zeros? matrix) z-counts (map count-preceeding-zeros (filter #(not (all-zeros? %)) matrix))]
-    (and (every? #(= true %) (drop-while #(= false %) z-rows))
-         (apply < z-counts))))
+    (and (apply < z-counts)
+         (every? #(= true %) (drop-while #(= false %) z-rows)))))
 
 ; Elementary row operatations
 (defn multiply-row [matrix row value]
