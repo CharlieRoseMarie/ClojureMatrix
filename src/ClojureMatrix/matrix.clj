@@ -55,6 +55,13 @@
   "Returns the transpose of the matrix."
   (apply map vector matrix))
 
+; Symmetric check
+
+(defn symmetric? [matrix]
+  {:pre [(proper? matrix)]}
+  "Returns true if the matrix equals it's own transpose."
+  (= matrix (transpose matrix)))
+
 ; REF check
 
 (defn ref? [matrix]

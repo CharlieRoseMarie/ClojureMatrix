@@ -34,6 +34,11 @@
 	(is (square? sample-matrix))
 	(is (not (square? (conj sample-matrix [1 1 1])))))
 
+(deftest sym-test
+  (is (symmetric? [[1 2 3] [2 1 4] [3 4 1]]))
+  (is (not (symmetric? sample-matrix)))
+  (is (thrown? AssertionError (symmetric? [[1] [2 2]]))))
+
 (deftest ref-test
   (is (= true (ref? [[1 1 1] [0 1 1] [0 0 1]])))
   (is (= true (ref? [[1 1 1 1] [0 0 0 1]])))
