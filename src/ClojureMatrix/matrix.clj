@@ -75,7 +75,7 @@
 (defn multiply-row [matrix row value]
   {:pre [(proper? matrix) (>= row 0) (< row (count matrix))]}
   "Multiplies the given row by some value. Returns the matrix."
-  (update-in matrix [row] (fn [x] (map #(* value %) x))))
+  (assoc matrix row (map #(* value %) (matrix row))))
 
 (defn swap-rows [matrix r1 r2]
   {:pre [(proper? matrix) (>= r1 0) (< r1 (count matrix)) (>= r2 0) (< r2 (count matrix))]}
