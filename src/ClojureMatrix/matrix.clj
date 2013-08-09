@@ -84,3 +84,10 @@
     (-> matrix
         (assoc r2 row1)
         (assoc r1 row2))))
+
+(defn add-rows [matrix r1 m-val r2]
+  {:pre [(proper? matrix) (>= 0 r1) (>= 0 r2) (< r1 (count matrix)) (< r2 (count matrix))]}
+  "Returns the matrix with the r1 row multiplied by m-val added to row r2"
+  (let [add-row (map #(* % m-val) (matrix r1))
+        new-row (map + (matrix r2) add-row)]
+    (assoc matrix r2 new-row)))
