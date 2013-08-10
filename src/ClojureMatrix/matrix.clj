@@ -36,6 +36,21 @@
   {:pre [(proper? matrix) (< col (count (first matrix)))]}
 	(map #(nth %1 col) matrix))
 
+(defn remove-row [matrix row]
+  {:pre [(proper? matrix) (>= row 0) (< row (count matrix))]}
+  "Returns the matrix without the given row"
+  (let [first-matrix (subvec matrix 0 row)
+        second-matrix (subvec matrix (inc row))]
+    (concat first-matrix second-matrix)))
+
+(defn remove-column [matrix col]
+  {:pre [(proper? matrix) (>= col 0) (< col (count (first matrix)))]}
+  "Returns the matrix without the given column"
+  (letfn [(rem-ele [row]
+          (concat (subvec row 0 col)
+                (subvec row (inc col))))]
+    (map rem-ele matrix)))
+
 (defn multiplicable? [matrixA matrixB]
   {:pre [(proper? matrixA) (proper? matrixB)]}
 	"If true, returns a vector of the dimensions of the matrix that would result from multiplying the
@@ -54,6 +69,9 @@
   {:pre [(proper? matrix)]}
   "Returns the transpose of the matrix."
   (apply map vector matrix))
+
+(defn minor [matrix i j]
+  {:pre [(proper? matrix)]})
 
 ; Symmetric check
 
@@ -91,3 +109,11 @@
   (let [add-row (map #(* % m-val) (matrix r1))
         new-row (map + (matrix r2) add-row)]
     (assoc matrix r2 new-row)))
+; REF
+
+(defn make-ref [matrix]
+  {:pre [(proper? matrix)]}
+  "Transforms the matrix into REF form"
+  (loop [m matrix piv 0]
+    (if (ref? m) m
+      (recur (sort-by count-preceeding-zeros m) (inc piv)))))
