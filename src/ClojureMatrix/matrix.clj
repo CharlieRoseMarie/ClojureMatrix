@@ -70,8 +70,10 @@
   "Returns the transpose of the matrix."
   (apply map vector matrix))
 
-(defn minor [matrix i j]
-  {:pre [(proper? matrix)]})
+(defn minor [matrix row col]
+  {:pre [(proper? matrix)]}
+  "Returns the minor of the matrix for the given row and column"
+  (remove-row (remove-column matrix col) row))
 
 ; Symmetric check
 
@@ -110,6 +112,12 @@
         new-row (map + (matrix r2) add-row)]
     (assoc matrix r2 new-row)))
 ; REF
+
+(defn- get-piv [matrix row]
+  {:pre (proper? matrix) (>= row 0) (< row (count matrix))}
+  (let [piv (first (drop-while #(= 0 %) (matrix row)))
+        piv-loc (count-preceeding-zeros (matrix row))]
+    (hash-map :piv piv :loc piv-loc)))
 
 (defn make-ref [matrix]
   {:pre [(proper? matrix)]}
