@@ -111,6 +111,7 @@
   (let [add-row (map #(* % m-val) (matrix r1))
         new-row (map + (matrix r2) add-row)]
     (assoc matrix r2 new-row)))
+
 ; REF
 
 (defn- get-piv [matrix row]
@@ -119,9 +120,28 @@
         piv-loc (count-preceeding-zeros (matrix row))]
     (hash-map :piv piv :loc piv-loc)))
 
+(defn- add-vectors [v1 v2 mult]
+  (map + v2 (map #(* mult %) v1)))
+
+(defn- get-first-nonzero [v]
+  (first (drop-while #(= 0 %) v)))
+
+(defn- eliminate-at-row [matrix row]
+  (let [first-half (subvec matrix 0 (inc row))
+        v (matrix row)
+        second-half (subvec matrix (inc row))
+        piv-val ((get-piv matrix row) :piv)
+        piv-loc ((get-piv matrix row) :loc)
+        modified-half (map vec (map #(add-vectors v % (- (/ (% piv-loc) piv-val))) second-half))]
+    (vec (concat first-half modified-half))))
+
+
 (defn make-ref [matrix]
   {:pre [(proper? matrix)]}
   "Transforms the matrix into REF form"
-  (loop [m matrix piv 0]
-    (if (ref? m) m
-      (recur (sort-by count-preceeding-zeros m) (inc piv)))))
+  (let [sort-m (vec (sort-by count-preceeding-zeros matrix))]
+  (loop [m sort-m piv 0]
+    (cond
+     (ref? m) m
+     (not= 1 ((get-piv m piv) :piv)) (recur (multiply-row m piv (/ ((get-piv m piv) :piv))) piv)
+     :else (recur (vec (sort-by count-preceeding-zeros (eliminate-at-row m piv))) (inc piv))))))
