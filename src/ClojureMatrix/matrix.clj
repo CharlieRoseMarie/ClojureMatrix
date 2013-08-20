@@ -17,6 +17,16 @@
 		(if (= i nth-col)
 			1 0)))
 
+(defn zero-matrix? [matrix]
+  {:pre [(proper? matrix)]}
+  (every? #(all-zeros? %) matrix))
+
+(defn vector-dot-product
+  "Returns the dot product of one or more vectors"
+  ([] 0)
+  ([v] (apply + v))
+  ([v1 v2]) (reduce + (map * v1 v2)))
+
 (defn create-identity [n]
   {:pre [(> n 0)]}
 	"Creates an identity matrix of size n*n"
@@ -35,6 +45,11 @@
 (defn get-column [matrix col]
   {:pre [(proper? matrix) (< col (count (first matrix)))]}
 	(map #(nth %1 col) matrix))
+
+(defn get-dimensions [matrix]
+  {:pre [(proper? matrix)]}
+  "Retuns the dimensions of the matrix"
+  [(count (get-row matrix 0)) (count (get-column matrix 0))])
 
 (defn remove-row [matrix row]
   {:pre [(proper? matrix) (>= row 0) (< row (count matrix))]}
@@ -135,13 +150,35 @@
         modified-half (map vec (map #(add-vectors v % (- (/ (% piv-loc) piv-val))) second-half))]
     (vec (concat first-half modified-half))))
 
-
 (defn make-ref [matrix]
   {:pre [(proper? matrix)]}
   "Transforms the matrix into REF form"
   (let [sort-m (vec (sort-by count-preceeding-zeros matrix))]
   (loop [m sort-m piv 0]
     (cond
+     (zero-matrix? m) m
      (ref? m) m
      (not= 1 ((get-piv m piv) :piv)) (recur (multiply-row m piv (/ ((get-piv m piv) :piv))) piv)
      :else (recur (vec (sort-by count-preceeding-zeros (eliminate-at-row m piv))) (inc piv))))))
+
+; Algebraic operations
+
+(defn scalar-multiply [matrix v]
+  (map (fn [row] (map #(* v %) row)) matrix))
+
+(letfn [(add-vectors [v1 v2] (map + v1 v2))]
+ (defn add
+  ([m] m)
+  ([m1 m2]
+    (map #(add-vectors %1 %2) m1 m2))
+  ([m1 m2 & ms]
+    (let [initial (add m1 m2)]
+      (reduce add initial ms)))))
+
+(letfn [(sub-vectors [v1 v2] (map - v1 v2))]
+ (defn subtract
+  ([m] (scalar-multiply m -1))
+  ([m1 m2] (map #(sub-vectors %1 %2) m1 m2))
+  ([m1 m2 & ms]
+   (let [initial (subtract m1 m2)]
+     (reduce subtract initial ms)))))
