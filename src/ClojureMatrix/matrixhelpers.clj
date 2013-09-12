@@ -38,3 +38,13 @@
         modified-half (map vec (map #(add-vectors v % (- (/ (% piv-loc) piv-val))) second-half))]
     (vec (concat first-half modified-half))))
 
+(defn- pos-or-zero? [n]
+  "Returns true if the number is either 0 or positive"
+  (or (zero? n) (pos? n)))
+
+(defn wrap-get [v i]
+ (let [l (count v)]
+  (cond
+   (and (pos-or-zero? i) (< i l)) (v i)
+   (pos? i) (recur v (- i l))
+   :else (recur v (+ l i)))))

@@ -1,5 +1,6 @@
 (ns ClojureMatrix.matrixexperimental
-  (:require [ClojureMatrix.vector :as v]))
+  (:require [ClojureMatrix.vector :as v]
+            [ClojureMatrix.matrixhelpers :as mh]))
 
 (defrecord Matrix [rows columns data])
 
@@ -17,6 +18,9 @@
   "Returns true if the col is with the dimensions of the matrix"
   (and (>= col 0) (< col (:columns matrix))))
 
+(defn square? [{:keys [rows columns]}]
+  (= rows columns))
+
 (defn matrix-from-nested [matrix]
   (let [proper (apply = (map count matrix))
         rows (count matrix)
@@ -26,15 +30,15 @@
 
 (defn matrix-to-nested [matrix]
   "Turns a matrix object into a nested vector"
-  (vec (map vec (partition (:rows matrix) (:data matrix)))))
+  (vec (map vec (partition (:columns matrix) (:data matrix)))))
 
 ; Test values
 (def m1 (Matrix. 3 3 [1 0 1, 0 1 2, 0 0 1]))
-(def m2 (matrix-from-nested [[1 1 6 0][1 1 1 5][1 1 1 1]]))
+(def m2 (matrix-from-nested [[1 1 6 0][1 2 3 5][1 1 1 1][7 4 2 1]]))
 
 (defn get-element [matrix row col]
   {:pre [(valid-row? matrix row) (valid-column? matrix col)]}
-  (let [e (+ (* (:rows matrix) row) col)
+  (let [e (+ (* (:columns matrix) row) col)
         data (:data matrix)]
     (data e)))
 
@@ -60,6 +64,42 @@
         new-col (:rows matrix)
         new-data (apply concat(for [i (range new-row)] (get-column matrix i)))]
     (Matrix. new-row new-col (vec new-data))))
+
+(defn minor [matrix row col]
+  (let [new-data (for [i (range (:rows matrix))
+                        j (range (:columns matrix))
+                        :when (and (not= row i) (not= col j))]
+                    (get-element matrix i j))]
+    (Matrix. (dec (:rows matrix)) (dec (:columns matrix)) (vec new-data))))
+
+(defn zero-rows? [matrix]
+  "Returns true if the matrix contains at least one zero-row"
+  (let [rows (for [i (range (:rows matrix))] (get-row matrix i))]
+    (some #(every? zero? %) rows)))
+
+(defn get-diagonal [matrix col & dir]
+  (when (square? matrix)
+      (if dir
+         (for [i (range (:rows matrix))]
+           (mh/wrap-get (get-row matrix i) (- col i)))
+         (for [i (range (:rows matrix))]
+           (mh/wrap-get (get-row matrix i) (+ col i))))))
+
+(defn determinate [{:keys [rows columns data] :as matrix}]
+  (when (square? matrix)
+    (cond
+     (number? matrix) matrix
+     (= 1 rows) (get data 0)
+     (= 2 rows) (- (* (nth data 0) (nth data 3)) (* (nth data 1) (nth data 2)))
+     (= 3 rows) (+ (* (nth data 0) (determinate (minor matrix 0 0)))
+                   (* (- (nth data 1)) (determinate (minor matrix 0 1)))
+                   (* (nth data 2) (determinate (minor matrix 0 2))))
+     :else (apply + (for [i (range rows)]
+                      (* (if (even? i) 1 -1)
+                         (nth data i)
+                         (determinate (minor matrix 0 i))))))))
+
+(determinate m2)
 
 ; Algebraic operations
 
